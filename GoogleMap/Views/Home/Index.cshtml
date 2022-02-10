@@ -1,0 +1,82 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Event Click LatLng</title>
+  </head>
+  <body>
+      <h1>akwdjlawkd</h1>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <div id="map"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Async script executes immediately and must be after any DOM elements used in callback. -->
+
+  </body>
+</html>
+
+@section Styles {
+      <style>
+        #map {
+            height: 500px;
+            width:100%;
+            position:absolute;
+        }
+
+    </style>
+}
+
+@section Scripts {
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDfLi504tlbF3ByNqnscoP6cCRSSU65wdc&callback=initMap&v=weekly"
+        async></script>
+<script>
+    var map = null;
+    var marker = null;
+    function addMarker(position) {
+        const marker = new google.maps.Marker({
+            position,
+            map,
+        });
+    }
+
+    function initMap(){
+        console.log("Harita Yüklendi.");
+        const myLatlng = { lat: 41.0441, lng: 29.0067 };
+        map = new google.maps.Map(document.getElementById("map"), {
+          zoom: 16,
+          center: myLatlng,
+          mapTypeId: "terrain"
+        });
+    map.addListener("click", (mapsMouseEvent) => {
+        console.log("Tıklandı");
+        console.log(mapsMouseEvent);
+        if(marker == null) {
+            marker = new google.maps.Marker({
+                position: mapsMouseEvent.latLng,
+                map: map
+            });
+
+            marker.getTitle(JSON.stringify(mapsMouseEvent.latLng.toJSON(), null, 2))
+        }
+        else{
+            marker.setMap(null);
+             marker = new google.maps.Marker({
+                position: mapsMouseEvent.latLng,
+                map: map,
+        });
+	}
+    console.log("Enlem: "+ mapsMouseEvent.latLng.lat());
+    console.log("Boylam: "+ mapsMouseEvent.latLng.lng());
+        marker.getTitle(JSON.stringify(mapsMouseEvent.latLng.toJSON(), null, 2))
+    });
+    }
+</script>
+
+}
