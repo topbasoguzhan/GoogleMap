@@ -8,7 +8,9 @@
     <title>Event Click LatLng</title>
   </head>
   <body>
-      <h1>akwdjlawkd</h1>
+      <h1>Harita</h1>
+      <input type="hidden" id="lng" name="lng" />
+                        <input type="hidden" id="lat" name="lat" />
     <div class="container">
         <div class="row">
             <div class="col-md-12">
@@ -34,49 +36,101 @@
 }
 
 @section Scripts {
-<script src="https://maps.googleapis.com/maps/api/js?key=API_KEY&callback=initMap&v=weekly"
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyALfHo1h42d50dpxE_tI9wn6-C7Rxt0GjE&callback=konumBul&v=weekly"
         async></script>
 <script>
-    var map = null;
-    var marker = null;
-    function addMarker(position) {
-        const marker = new google.maps.Marker({
-            position,
-            map,
-        });
-    }
 
-    function initMap(){
-        console.log("Harita Yüklendi.");
-        const myLatlng = { lat: 41.0441, lng: 29.0067 };
-        map = new google.maps.Map(document.getElementById("map"), {
-          zoom: 16,
-          center: myLatlng,
-          mapTypeId: "terrain"
-        });
-    map.addListener("click", (mapsMouseEvent) => {
-        console.log("Tıklandı");
-        console.log(mapsMouseEvent);
-        if(marker == null) {
-            marker = new google.maps.Marker({
-                position: mapsMouseEvent.latLng,
-                map: map
-            });
+function konumBul(position) {
+    console.log(position);
+    if (position != null) {
+        position.lat = parseFloat(position.lat);
+        position.lng = parseFloat(position.lng);
 
-            marker.getTitle(JSON.stringify(mapsMouseEvent.latLng.toJSON(), null, 2))
+        //harita işaretlenecek
+        var map = new google.maps.Map($('#map')[0], {
+            zoom: 15,
+            //center: new google.maps.LatLng(40.747688, -74.004142),
+            center: position,
+
+            mapTypeId: google.maps.MapTypeId.ROADMAP
+        });
+        var marker;
+        google.maps.event.addListener(map, 'click', function (e) {
+            if (marker == null) {
+                marker = new google.maps.Marker({
+                    position: position,
+                    title: "Hello World!"
+                });                
+            }
+            else {
+                marker.setMap(null);
+                marker = new google.maps.Marker({
+                    position: position,
+                    title: "Hello World!"
+                });
+
+            }
+            marker.setMap(map);
+            console.log(marker.getPosition().lat());
+            console.log(marker.getPosition().lng());
+            document.getElementById("lat").value = marker.getPosition().lat();
+            document.getElementById("lng").value = marker.getPosition().lng();
+        });
+    } else {
+        if (navigator.geolocation) {
+            console.log(); ('Geolocation destekliyor')
+            navigator.geolocation.getCurrentPosition(function (data) {
+                console.log(data);
+
+                const konum = {
+                    lat: data.coords.latitude,
+                    //lat: lat,
+                    //lng: lng,
+                    lng: data.coords.longitude
+                };
+
+                $(document).ready(function () {
+
+                    var map = new google.maps.Map($('#map')[0], {
+                        zoom: 15,
+                        //center: new google.maps.LatLng(40.747688, -74.004142),
+                        center: konum,
+
+                        mapTypeId: google.maps.MapTypeId.ROADMAP
+                    });
+                    var marker;
+                    google.maps.event.addListener(map, 'click', function (e) {
+                        if (marker == null) {
+                            marker = new google.maps.Marker({
+                                position: e["latLng"],
+                                title: "Hello World!"
+                            });
+
+                        }
+                        else {
+                            marker.setMap(null);
+                            marker = new google.maps.Marker({
+                                position: e["latLng"],
+                                title: "Hello World!"
+                            });
+
+                        }
+                        marker.setMap(map);
+                        console.log(marker.getPosition().lat());
+                        console.log(marker.getPosition().lng());
+                        //document.getElementById("lat").value = marker.getPosition().lat();
+                        document.getElementById("lng").value = marker.getPosition().lng();
+                    });
+                });
+
+            }, function (error) {
+                alert.apply(error.message);
+            })
+        } else {
+            alert('Geolocation desteklemiyor')
         }
-        else{
-            marker.setMap(null);
-             marker = new google.maps.Marker({
-                position: mapsMouseEvent.latLng,
-                map: map,
-        });
-	}
-    console.log("Enlem: "+ mapsMouseEvent.latLng.lat());
-    console.log("Boylam: "+ mapsMouseEvent.latLng.lng());
-        marker.getTitle(JSON.stringify(mapsMouseEvent.latLng.toJSON(), null, 2))
-    });
     }
+}
 </script>
 
 }
